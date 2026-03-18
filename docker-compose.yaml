@@ -1,3 +1,38 @@
+version: '3.8'
+name: expense
+networks:
+  default:
+    name: expense
+volumes:
+  mysql:
+    external: true
+
+services:
+  mysql:
+    image: mysql:v1.1
+    container_name: mysql
+    volumes:
+    - source: mysql
+      target: /var/lib/mysql
+      type: volume
+  backend:
+    image: backend:v1.1
+    container_name: backend
+    command: sh -c "sleep 60 && node /opt/server/index.js"
+    depends_on:
+    - mysql
+  frontend:
+    image: frontend:v1.1
+    container_name: frontend
+    depends_on:
+    - backend
+    ports:
+    - "80:80"
+#Note: after running app, stop and restart the all containers and verify volume existance.
+
+
+
+
 # version: '3.8'
 # name: expense
 # networks:
@@ -5,16 +40,13 @@
 #     name: expense
 # volumes:
 #   mysql:
-#     external: true
 
 # services:
 #   mysql:
 #     image: mysql:v1.1
 #     container_name: mysql
 #     volumes:
-#     - source: mysql
-#       target: /var/lib/mysql
-#       type: volume
+#       - mysql:/var/lib/mysql
 #   backend:
 #     image: backend:v1.1
 #     container_name: backend
@@ -29,37 +61,9 @@
 #     ports:
 #     - "80:80"
 
-  
+#Note: after running app, stop and restart the all containers and verify volume existance.
 
-version: '3.8'
-name: expense
-networks:
-  default:
-    name: expense
-volumes:
-  mysql:
 
-services:
-  mysql:
-    image: mysql:v1.1
-    container_name: mysql
-    volumes:
-      - mysql:/var/lib/mysql
-  backend:
-    image: backend:v1.1
-    container_name: backend
-    command: sh -c "sleep 60 && node /opt/server/index.js"
-    depends_on:
-    - mysql
-  frontend:
-    image: frontend:v1.1
-    container_name: frontend
-    depends_on:
-    - backend
-    ports:
-    - "80:80"
-
-  
 # Output of : 
 # [ root@ip-172-31-80-46 ~/8.5.expense-docker-volume ]# docker compose up -d
 # WARN[0000] /root/8.5.expense-docker-volume/docker-compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion
